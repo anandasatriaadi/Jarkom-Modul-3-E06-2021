@@ -90,6 +90,7 @@ Kemudian pada `Jipangu` edit `/etc/dhcp/dhcpd.conf` dan tambahkan seperti gambar
 Pertama pada EniesLobby atur dns supaya jualbelikapal.e06.com mengarah pada Water7 (10.32.2.3)
 
 ![image](https://user-images.githubusercontent.com/57354564/141470431-4d0c1f1e-e469-4f99-8cb8-cd202d97cda4.png)
+
 ![image](https://user-images.githubusercontent.com/57354564/141470494-4073d9f2-79c8-4a8b-90ac-94829042144e.png)
 
 Ubah nameserver pada Loguetown menjadi IP dari eniesLobby.
@@ -109,13 +110,17 @@ Kita coba melakukan lynx ke its.ac.id maka hasil sbg berikut:
 ## Nomor 9
 ###	Agar transaksi jual beli lebih aman dan pengguna website ada dua orang, proxy dipasang autentikasi user proxy dengan enkripsi MD5 dengan dua username, yaitu luffybelikapalyyy dengan password luffy_yyy dan zorobelikapalyyy dengan password zoro_yyy
 ### _Solusi_ 
+
 Menambahkan passwd di /etc/squid/passwd
+
 ![image](https://user-images.githubusercontent.com/57354564/141470898-43a96c23-40f1-45c8-a201-debefdff5c2e.png)
 
 Kemudian edit /etc/squid/squid.conf pada Water7 dan tambahkan baris berikut
+
 ![image](https://user-images.githubusercontent.com/57354564/141470915-298c6744-111f-443c-b029-06e8f32634b6.png)
 
 Setelah mencoba melakukan lynx pada Loguetown akan diminta password
+
 ![image](https://user-images.githubusercontent.com/57354564/141470940-6b421256-1b85-4ce8-8987-8334d0196611.png)
 
 ## Nomor 10
@@ -241,5 +246,31 @@ Coba `lynx google.com` di LogueTown
 
 ### _Solusi_
 
+Di Water7, buat `/etc/squid/acl-bandwidth.conf`
+```
+acl download url_regex -i \.jpg$ \.png$
+
+auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwd
+
+acl luffy proxy_auth luffybelikapale06
+acl zoro proxy_auth zorobelikapale06
+
+delay_pools 2
+delay_class 1 1
+delay_parameters 1 1250/1250
+delay_access 1 deny zoro
+delay_access 1 allow download
+delay_access 1 deny all
+
+delay_class 2 1
+delay_parameters 2 -1/-1
+delay_access 2 allow zoro
+delay_access 2 deny luffy
+delay_access 2 deny all
+```
+
+Tambahkan `include /etc/squid/acl-bandwidth.conf` di `/etc/squid/squid.conf`
+
 Zoro mencoba mendownload gambar .png dan .jpg
+
 ![image](https://user-images.githubusercontent.com/43901559/141468959-11b8de6f-8f64-498c-a6e0-ac11d2f2069d.png)
