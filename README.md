@@ -63,25 +63,60 @@
 
    Setelah di save, restart service `isc-dhcp-server`
    
-## Nomor 6
-###	Lama waktu DHCP server meminjamkan alamat IP kepada Client yang melalui Switch1 selama 6 menit sedangkan pada client yang melalui Switch3 selama 12 menit. Dengan waktu maksimal yang dialokasikan untuk peminjaman alamat IP selama 120 menit.
+## Nomor 6 <br/>
+###	Lama waktu DHCP server meminjamkan alamat IP kepada Client yang melalui Switch1 selama **6 menit** sedangkan pada client yang melalui Switch3 selama **12 menit**. Dengan waktu maksimal yang dialokasikan untuk peminjaman alamat IP selama **120 menit**. <br/>
 
-### _Solusi_
+### _Solusi_ 
+Pada `Jipangu` edit `etc/dhcp/dhcpd.conf`. Pada 10.32.1.0 (Switch 1) ubah `default-lease-time = 360` dan `max-lease time = 7200`. Pada 10.32.3.0 (Switch 1) ubah `default-lease-time = 720` dan `max-lease time = 7200`. <br/>
 
-## Nomor 7
-###	Luffy dan Zoro berencana menjadikan Skypie sebagai server untuk jual beli kapal yang dimilikinya dengan alamat IP yang tetap dengan IP [prefix IP].3.69
+![image](https://user-images.githubusercontent.com/57354564/141469963-532f8e93-ad87-4a53-b47d-987c492fa120.png)
 
-### _Solusi_
+## Nomor 7 <br/>
+###	Luffy dan Zoro berencana menjadikan `Skypie` sebagai server untuk jual beli kapal yang dimilikinya dengan alamat IP yang tetap dengan IP [prefix IP].3.69 <br/>
+
+### _Solusi:_ 
+Pada `Skypie` configure `/etc/network/interfaces` dengan **fixed hardware address** sbg berikut: <br/>
+
+![image](https://user-images.githubusercontent.com/57354564/141470111-e6a6c6fa-6e4f-4753-ac4d-f228162c6442.png)
+
+Kemudian pada `Jipangu` edit `/etc/dhcp/dhcpd.conf` dan tambahkan seperti gambar berikut untuk memberikan **Skypie fixed address**
+
+![image](https://user-images.githubusercontent.com/57354564/141470228-e51377bb-d68d-4dd8-a060-50f245d66440.png)
 
 ## Nomor 8
-### Soal disini
+###	Loguetown digunakan sebagai client Proxy agar transaksi jual beli dapat terjamin keamanannya, juga untuk mencegah kebocoran data transaksi. Pada Loguetown, proxy harus bisa diakses dengan nama jualbelikapal.yyy.com dengan port yang digunakan adalah 5000
 
-### _Solusi_
+### _Solusi_ 
+Pertama pada EniesLobby atur dns supaya jualbelikapal.e06.com mengarah pada Water7 (10.32.2.3)
+
+![image](https://user-images.githubusercontent.com/57354564/141470431-4d0c1f1e-e469-4f99-8cb8-cd202d97cda4.png)
+![image](https://user-images.githubusercontent.com/57354564/141470494-4073d9f2-79c8-4a8b-90ac-94829042144e.png)
+
+Ubah nameserver pada Loguetown menjadi IP dari eniesLobby.
+
+Atur squid pada Water7 sebagai proxy server. Edit /etc/squid/squid.conf menjadi sebagai berikut:
+
+![image](https://user-images.githubusercontent.com/57354564/141470607-ce54256b-5291-4eae-ae95-30cc1ae9953c.png)
+
+Loguetown sebagai client proxy diatur sebagai berikut:
+
+![image](https://user-images.githubusercontent.com/57354564/141470808-0216c7d9-2c51-4107-84e2-cd6635d83591.png)
+
+Kita coba melakukan lynx ke its.ac.id maka hasil sbg berikut:
+
+![image](https://user-images.githubusercontent.com/57354564/141470866-a42b56d6-9299-4a60-9ffc-bf3904565ac2.png)
 
 ## Nomor 9
-### Soal disini
+###	Agar transaksi jual beli lebih aman dan pengguna website ada dua orang, proxy dipasang autentikasi user proxy dengan enkripsi MD5 dengan dua username, yaitu luffybelikapalyyy dengan password luffy_yyy dan zorobelikapalyyy dengan password zoro_yyy
+### _Solusi_ 
+Menambahkan passwd di /etc/squid/passwd
+![image](https://user-images.githubusercontent.com/57354564/141470898-43a96c23-40f1-45c8-a201-debefdff5c2e.png)
 
-### _Solusi_
+Kemudian edit /etc/squid/squid.conf pada Water7 dan tambahkan baris berikut
+![image](https://user-images.githubusercontent.com/57354564/141470915-298c6744-111f-443c-b029-06e8f32634b6.png)
+
+Setelah mencoba melakukan lynx pada Loguetown akan diminta password
+![image](https://user-images.githubusercontent.com/57354564/141470940-6b421256-1b85-4ce8-8987-8334d0196611.png)
 
 ## Nomor 10
 ### Transaksi jual beli tidak dilakukan setiap hari, oleh karena itu akses internet dibatasi hanya dapat diakses setiap hari Senin-Kamis pukul 07.00-11.00 dan setiap hari Selasa-Jum’at pukul 17.00-03.00 keesokan harinya (sampai Sabtu pukul 03.00)
